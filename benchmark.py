@@ -1,4 +1,5 @@
 import csv
+import sys
 
 def readFiles(correctLabelsFileName, outputLabelsFileName):
     correctLabelsList, outputLabelsList = [], []
@@ -15,5 +16,14 @@ def readFiles(correctLabelsFileName, outputLabelsFileName):
     return correctLabelsList, outputLabelsList
 
 
-def correctRate():
-    correctLabelsList, outputLabelsList = readFiles("hw12data/digitsDataset/valLabels", "valOutput")
+def correctRate(k):
+    correctLabelsList, outputLabelsList = readFiles("hw12data/digitsDataset/valLabels", "valOutput" + str(k))
+    length = len(correctLabelsList)
+    same = 0
+    for i in range(length):
+        if correctLabelsList[i] == outputLabelsList[i]:
+            same+=1
+    print("correct rate: " + str(same/length*100) + "%")
+
+k = sys.argv[1]
+correctRate(k)

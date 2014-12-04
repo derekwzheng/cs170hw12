@@ -4,7 +4,7 @@ import numpy.linalg as LA
 from collections import Counter
 
 # Global variable to specify the k value for the k nearest neighbors algorithm
-K = 100
+K = 25
 
 def readCSVFile(featuresFileName, labelsFileName):
     """ Read FILENAME.csv and LABELSFILENAME.csv. Turn them into a list of
