@@ -55,7 +55,6 @@ def KNN(k, featureList, labelList, image):
     counts = Counter(minArray)
     return counts.most_common(1)[0][0]
 
-
 def readValidationFeaturesFile(valFeaturesFileName):
     """ Read validation features file and return a list of tuples. """
     validationFeaturesList = []
