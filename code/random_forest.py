@@ -6,9 +6,9 @@ import random
 from math import log2
 
 # a random forests classifier with T trees
-T = 5
+T = 10
 # Maximum depth of a decision tree.
-MAX_DEPTH = 5
+MAX_DEPTH = 4
 
 def readCSVFile(featuresFileName, labelsFileName):
     """ Read FILENAME.csv and LABELSFILENAME.csv. Turn them into a list of
