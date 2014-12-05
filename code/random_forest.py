@@ -5,6 +5,10 @@ from collections import Counter
 import random
 from math import log2
 
+#a random forests classifier with T trees
+T = 2
+
+
 def readCSVFile(featuresFileName, labelsFileName):
     """ Read FILENAME.csv and LABELSFILENAME.csv. Turn them into a list of
         tuples and a list of integers, resplectively. Every element in the
@@ -41,10 +45,7 @@ def readValidationFeaturesFile(valFeaturesFileName):
     return validationFeaturesList
 
 def countSpamAndHam(labelsList):
-    cnt = Counter()
-    for label in labelsList:
-        cnt[label] += 1
-    return cnt
+    return Counter(labelsList)
 
 
 # Global variables to store the training set
@@ -59,22 +60,34 @@ SPAM = 1
 NONSPAM = 0
 TRAINING_COUNTER = countSpamAndHam(labelsList)
 
+
 def entropy(s):
     labels = [trainingDic[email] for email in s]
     cnt = countSpamAndHam(labels)
-    return -((cnt[SPAM]) / len(labels)) * log2((cnt[SPAM]) / len(labels)) \
-        - ((cnt[NONSPAM]) / len(labels)) * log2(cnt[NONSPAM] / len(labels))
+    if cnt[SPAM] == 0:
+        firstTerm = 0
+    else:
+        firstTerm = -((cnt[SPAM]) / len(labels)) * log2((cnt[SPAM]) / len(labels))
+    if cnt[NONSPAM] == 0:
+        secondTerm = 0
+    else:
+        secondTerm = -((cnt[NONSPAM]) / len(labels)) * log2(cnt[NONSPAM] / len(labels))
+    return  firstTerm + secondTerm
+        
 
 class LeafNode:
     def __init__(self, classification):
         self.classification = classification
+        self.isLeaf = True
 
 class InternalNode:
     def __init__(self, feature, threshold, left, right):
+        self.isLeaf = False
         self.feature = feature
         self.threshold = threshold
         self.left = left
         self.right = right
+ 
 
 def isSameClass(lst):
     length = len(lst)
@@ -82,6 +95,9 @@ def isSameClass(lst):
         if trainingDic[lst[i]] != trainingDic[lst[i + 1]]:
             return False
     return True
+
+def stopping(lst):
+    return entropy(lst) <= 0.2
 
 def split(lst, feature, threshold):
     leftList, rightList = [], []
@@ -98,11 +114,14 @@ def informationGain(s, sLeft, sRight):
 
 def build_tree(s):
     """ It take S, a list of features vectors. """
-    if isSameClass(s):
-        return LeafNode(trainingDic[s[0]])
+    if s == []:
+        return LeafNode(random.randint(0,1))
+    if stopping(s):
+        ctn =  Counter([trainingDic[vec] for vec in s])
+        return LeafNode(ctn.most_common(1)[0][0])
     argmaxF, argmaxT, maxInfoGain = None, None, -float("inf")
     for f in random.sample(FEATURES, NUMBER_SELECTED_FEATURES):
-        values = {featuresList[x[f]] for x in featuresList}
+        values = {x[f] for x in s}
         for t in values:
             sLeft, sRight = split(s, f, t)
             infoGain = informationGain(s, sLeft, sRight)
@@ -112,13 +131,28 @@ def build_tree(s):
     sLeft, sRight = split(s, argmaxF, argmaxT)
     return InternalNode(argmaxF, argmaxT, build_tree(sLeft), build_tree(sRight))
 
+def classify(decisionTree, email):
+    """ walk down decisionTree and return the classification of the email"""
+    while not decisionTree.isLeaf:
+        if email[decisionTree.feature] <= decisionTree.threshold:
+            decisionTree = decisionTree.left
+        else:
+            decisionTree = decisionTree.right
+    return decisionTree.classification
+
 def main():
-    fetureList, labelList \
-        = readCSVFile("../hw12data/emailDataset/trainFeatures", \
-                      "../hw12data/emailDataset/trainLabels")
     validationFeaturesList = readValidationFeaturesFile("../hw12data/emailDataset/valFeatures")
-    for image in validationFeaturesList:
-        # FIXME
+    TreeArray = []
+    for tree in range(T):
+        randomIndices = numpy.random.choice(len(featuresList), len(featuresList))
+        baggingList = [featuresList[i] for i in randomIndices]
+        TreeArray.append(build_tree(baggingList))
+    classArray = []
+    for email in validationFeaturesList:
+        for decisionTree in TreeArray:
+            classArray.append(classify(decisionTree, email))
+        counts = Counter(classArray)
+        print(counts.most_common(1)[0][0])
 
 if __name__ == "__main__":
     main()

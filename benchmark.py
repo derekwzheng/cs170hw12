@@ -17,7 +17,7 @@ def readFiles(correctLabelsFileName, outputLabelsFileName):
 
 
 def correctRate(k):
-    correctLabelsList, outputLabelsList = readFiles("hw12data/digitsDataset/valLabels", "valOutput" + str(k))
+    correctLabelsList, outputLabelsList = readFiles("hw12data/emailDataset/valLabels", "code/ruleOutput" + str(k))
     length = len(correctLabelsList)
     same = 0
     for i in range(length):
