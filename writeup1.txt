@@ -1,0 +1,30 @@
+(a) k  | Error Rate
+  ----------------------------
+  | 1  | 8.899999999999997%  |
+  | 2  | 13.100000000000001% |
+  | 5  | 9.599999999999998%  |
+  | 10 | 11.6%               |
+  | 25 | 13.100000000000001% |
+  ----------------------------
+  The value k = 1 is the best.
+
+(b) When there is a tie, we choose the closest neighbor to classify an image.
+
+(c) No. The algorithm does not perform significantly differently for k = 1 and k = 2. Because the way we break tie
+    is to choose the closest neighbor. Then if there is a tie, then we classify the image to be the same class as
+    the closest neighbor. So, the second closest neighbor does not really affect the result.
+
+(d) I look at the misclassified examples and realize the classifier always confuse about the following pairs:
+    (1, 7)
+    (3, 8)
+    (1, 4)
+    (6, 8)
+    ...
+    The reason why the classifier makes mistakes is because some numbers are very similar. For example, both the
+    number 6 and the number 8 contain a "cycle". Both the number 1 and the number 7 contain a vertical
+    bar.
+    So, I think we can add more features to increase the accuracy.
+    i) We can add a cycle detection to detect whether a handwritten digit has a cycle. If it does, then it is
+        probably one of '2', '3', '6', '8', '9', or '0'.
+    ii) We can add a vertical bar detection to detect whether a handwritten digit has a vertical bar. It it does,
+        it probably is one of '1', '4', or '7'.

@@ -16,14 +16,14 @@ def readFiles(correctLabelsFileName, outputLabelsFileName):
     return correctLabelsList, outputLabelsList
 
 
-def correctRate(k):
-    correctLabelsList, outputLabelsList = readFiles("hw12data/emailDataset/valLabels", "code/ruleOutput" + str(k))
+def rates(k):
+    correctLabelsList, outputLabelsList = readFiles("hw12data/digitsDataset/valLabels", "code/digitsOutput" + str(k))
     length = len(correctLabelsList)
     same = 0
     for i in range(length):
         if correctLabelsList[i] == outputLabelsList[i]:
-            same+=1
-    print("correct rate: " + str(same/length*100) + "%")
-
+            same += 1
+    print("correct rate: " + str(same / length * 100) + "%")
+    print("error rate: " + str((1 - same / length) * 100) + "%")
 k = sys.argv[1]
-correctRate(k)
+rates(k)
