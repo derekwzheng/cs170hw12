@@ -51,8 +51,8 @@ def countSpamAndHam(labelsList):
 
 # Global variables to store the training set
 featuresList, labelsList \
-    = readCSVFile("../hw12data/emailDataset/trainFeatures", \
-                      "../hw12data/emailDataset/trainLabels")
+    = readCSVFile("hw12data/emailDataset/trainFeatures", \
+                      "hw12data/emailDataset/trainLabels")
 trainingDic = dict(zip(featuresList, labelsList))
 # Global Constants
 FEATURES = list(range(0, 57))
@@ -143,7 +143,7 @@ def classify(decisionTree, email):
     return decisionTree.classification
 
 def main():
-    validationFeaturesList = readValidationFeaturesFile("../hw12data/emailDataset/valFeatures")
+    validationFeaturesList = readValidationFeaturesFile("hw12data/emailDataset/testFeatures")
     TreeArray = []
     for tree in range(T):
         randomIndices = numpy.random.choice(len(featuresList), len(featuresList))
