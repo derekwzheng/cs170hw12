@@ -5,9 +5,10 @@ from collections import Counter
 import random
 from math import log2
 
-#a random forests classifier with T trees
-T = 2
-
+# a random forests classifier with T trees
+T = 5
+# Maximum depth of a decision tree.
+MAX_DEPTH = 5
 
 def readCSVFile(featuresFileName, labelsFileName):
     """ Read FILENAME.csv and LABELSFILENAME.csv. Turn them into a list of
@@ -97,7 +98,7 @@ def isSameClass(lst):
     return True
 
 def stopping(lst):
-    return entropy(lst) <= 0.2
+    return entropy(lst) <= 0.15
 
 def split(lst, feature, threshold):
     leftList, rightList = [], []
@@ -112,11 +113,12 @@ def informationGain(s, sLeft, sRight):
     return entropy(s) - ((len(sLeft) / len(s) * entropy(sLeft)) + len(sRight) \
                          / len(s) * entropy(sRight))
 
-def build_tree(s):
-    """ It take S, a list of features vectors. """
+def build_tree(s, d):
+    """ It take S, a list of features vectors. Return a decision tree with depth
+        at most D. """
     if s == []:
         return LeafNode(random.randint(0,1))
-    if stopping(s):
+    if stopping(s) or d == 0:
         ctn =  Counter([trainingDic[vec] for vec in s])
         return LeafNode(ctn.most_common(1)[0][0])
     argmaxF, argmaxT, maxInfoGain = None, None, -float("inf")
@@ -129,7 +131,7 @@ def build_tree(s):
                 argmaxF, argmaxT = f, t
                 maxInfoGain = infoGain
     sLeft, sRight = split(s, argmaxF, argmaxT)
-    return InternalNode(argmaxF, argmaxT, build_tree(sLeft), build_tree(sRight))
+    return InternalNode(argmaxF, argmaxT, build_tree(sLeft, d - 1), build_tree(sRight, d - 1))
 
 def classify(decisionTree, email):
     """ walk down decisionTree and return the classification of the email"""
@@ -146,7 +148,7 @@ def main():
     for tree in range(T):
         randomIndices = numpy.random.choice(len(featuresList), len(featuresList))
         baggingList = [featuresList[i] for i in randomIndices]
-        TreeArray.append(build_tree(baggingList))
+        TreeArray.append(build_tree(baggingList, MAX_DEPTH))
     classArray = []
     for email in validationFeaturesList:
         for decisionTree in TreeArray:
